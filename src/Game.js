@@ -10,6 +10,8 @@ function Game() {
     player2: [DEFENSE, BORING],
   });
 
+  const [looser, setLooser] = useState(null);
+
   const [drawPile, setDrawPile] = useState([BORING, BUM, DEFENSE, BORING]);
 
   const [discardPile, setDiscardPile] = useState([]);
@@ -35,8 +37,9 @@ function Game() {
       ];
       return newDrawPile;
     } else {
-      throw new Error("Game over");
+      setLooser(player)
     }
+    return drawPile;
   };
 
   const drawACard = (player) => {
@@ -55,30 +58,35 @@ function Game() {
     }
     setDrawPile(newDrawPile);
   };
-
+  if (looser != null) {
+    return `${looser}, you loose!`  
+  }
   return (
     <>
       <h1>Exploding pussies</h1>
       {Object.keys(players).map((player) => (
-        <p>
+        <p key={player}>
           Cards of {player}:{" "}
-          <button onClick={() => drawACard(player)}>Draw a card</button>
-          {players[player].map((card) => (
-            <li>{card}</li>
+          <button onClick={() => drawACard(player)}>Draw a card, {player}!</button>
+          {players[player].map((card, index) => (
+            <li key={index}>{card}</li>
           ))}
         </p>
       ))}
       <p>
         Cards in draw pile:
-        {drawPile.map((card) => (
-          <li>{card}</li>
+        {drawPile.map((card, index) => (
+          <li key={index}>{card}</li>
         ))}
       </p>
       <p>
         Cards in discard pile:
-        {discardPile.map((card) => (
-          <li>{card}</li>
+        {discardPile.map((card, index) => (
+          <li key={index}>{card}</li>
         ))}
+      </p>
+      <p>
+        Looser here
       </p>
     </>
   );
