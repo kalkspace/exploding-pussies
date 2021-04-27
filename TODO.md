@@ -1,4 +1,5 @@
 - random hands for players and random draw pile
+
   rules:
     - ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
     - every player gets one defense card
