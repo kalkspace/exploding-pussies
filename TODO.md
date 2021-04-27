@@ -1,10 +1,11 @@
 - random hands for players and random draw pile
   rules:
     - ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
-    - every player gets on defense card
+    - every player gets one defense card
+   
 - choose / set number of players (with names)
 
-- ste state: current player, next player
+- set state: current player, next player
 
 - define other cards instead of BORING
   - shuffle
@@ -18,4 +19,4 @@
   - force another player to give you one card of her choice
   - force another player to give you a special card - if it is there
 
-- hide hands and from view 
+- hide playerCards and drawPile from view
