@@ -20,3 +20,12 @@ test('game ends after two draws', () => {
   fireEvent.click(buttonPlayer1)
   expect(screen.getByText(/player1, you loose!/i)).toBeInTheDocument();
 });
+
+test('game does not end after two draws', () => {
+  render(<Game />);
+  const buttonPlayer2 = screen.getByText(/draw a card, player2/i)
+  const buttonPlayer1 = screen.getByText(/draw a card, player1/i)
+  fireEvent.click(buttonPlayer1)
+  fireEvent.click(buttonPlayer2)
+  expect(screen.queryByText(/you loose!/i)).toBeNull();
+});

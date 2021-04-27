@@ -1,74 +1,103 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 const BUM = "Bumm!";
 const DEFENSE = "Defense";
 const BORING = "Boring";
 
-function Game() {
-  const [players, setPlayers] = useState({
+const DRAWACARD = "drawACard";
+
+const initialState = {
+  looser: null,
+  playerCards: {
     player1: [BORING, BORING],
     player2: [DEFENSE, BORING],
-  });
+  },
+  drawPile: [BORING, BUM, DEFENSE, BORING],
+  discardPile: []
+}
 
-  const [looser, setLooser] = useState(null);
+const drawACardAction = {
+  type: DRAWACARD,
+  player: ''
+}
 
-  const [drawPile, setDrawPile] = useState([BORING, BUM, DEFENSE, BORING]);
+const handleBum = (prevState, player) => {
+  const { playerCards, drawPile, discardPile } = prevState
+  const cards = playerCards[player];
+  const defenseIndex = cards.indexOf(DEFENSE);
+  if (defenseIndex !== -1) {
+    const currentPlayerCards = [
+      ...cards.slice(0, defenseIndex),
+      ...cards.slice(defenseIndex + 1),
+    ];
+    const newPlayerCards = {
+      ...playerCards,
+      [player]: currentPlayerCards,
+    };
+    const newDiscardPile = [...discardPile, DEFENSE];
+    const newBumIndex = Math.random() * drawPile.length;
+    const newDrawPile = [
+      ...drawPile.slice(0, newBumIndex),
+      BUM,
+      ...drawPile.slice(newBumIndex),
+    ];
+    return {
+      ...prevState,
+      drawPile: newDrawPile,
+      playerCards: newPlayerCards,
+      discardPile: newDiscardPile
+    };
+  } else {
+    return { ...prevState, looser: player }
+  }
+};
 
-  const [discardPile, setDiscardPile] = useState([]);
-
-  const handleBum = (player, drawPile) => {
-    const cards = players[player];
-    const defenseIndex = cards.indexOf(DEFENSE);
-    if (defenseIndex !== -1) {
-      const newPlayerCards = [
-        ...cards.slice(0, defenseIndex),
-        ...cards.slice(defenseIndex + 1),
-      ];
-      setPlayers({
-        ...players,
-        [player]: newPlayerCards,
-      });
-      setDiscardPile([...discardPile, DEFENSE]);
-      const newBumIndex = Math.random() * drawPile.length;
-      const newDrawPile = [
-        ...drawPile.slice(0, newBumIndex),
-        BUM,
-        ...drawPile.slice(newBumIndex),
-      ];
-      return newDrawPile;
-    } else {
-      setLooser(player)
+const reducer = (prevState, action) => {
+  switch (action.type) {
+    case DRAWACARD: {
+      const { player } = action;
+      const [card, ...newDrawPile] = prevState.drawPile;
+      switch (card) {
+        case BUM: {
+          return handleBum(prevState, player);
+        }
+        default: {
+          const playerCards = {
+            ...prevState.playerCards,
+            [player]: [...prevState.playerCards[player], card],
+          };
+          return {
+            ...prevState,
+            drawPile: newDrawPile,
+            playerCards,
+          }
+        }
+      }
     }
-    return drawPile;
-  };
+  }
+
+  return prevState
+
+}
+
+function Game() {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const { looser, drawPile, discardPile, playerCards } = state
 
   const drawACard = (player) => {
-    let [card, ...newDrawPile] = drawPile;
-    switch (card) {
-      case BUM: {
-        newDrawPile = handleBum(player, newDrawPile);
-        break;
-      }
-      default: {
-        setPlayers({
-          ...players,
-          [player]: [...players[player], card],
-        });
-      }
-    }
-    setDrawPile(newDrawPile);
+    dispatch({ type: DRAWACARD, player })
   };
   if (looser != null) {
-    return `${looser}, you loose!`  
+    return `${looser}, you loose!`
   }
   return (
     <>
       <h1>Exploding pussies</h1>
-      {Object.keys(players).map((player) => (
+      {Object.keys(playerCards).map((player) => (
         <p key={player}>
           Cards of {player}:{" "}
           <button onClick={() => drawACard(player)}>Draw a card, {player}!</button>
-          {players[player].map((card, index) => (
+          {playerCards[player].map((card, index) => (
             <li key={index}>{card}</li>
           ))}
         </p>
@@ -76,17 +105,14 @@ function Game() {
       <p>
         Cards in draw pile:
         {drawPile.map((card, index) => (
-          <li key={index}>{card}</li>
-        ))}
+        <li key={index}>{card}</li>
+      ))}
       </p>
       <p>
         Cards in discard pile:
         {discardPile.map((card, index) => (
-          <li key={index}>{card}</li>
-        ))}
-      </p>
-      <p>
-        Looser here
+        <li key={index}>{card}</li>
+      ))}
       </p>
     </>
   );
