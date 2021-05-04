@@ -8,11 +8,11 @@ export const BORING = "Boring";
 
 const DRAWACARD = "drawACard";
 
-const initialState = (numberOfPlayers, generateHand) => ({
+const initialState = (numberOfPlayers, generateHand, generateDrawPile) => ({
   numberOfPlayers,
   looser: null,
   playerCards: new Array(numberOfPlayers).fill().map((hand, playerNumber) => generateHand(playerNumber)),
-  drawPile: [BORING, BUM, DEFENSE, BORING],
+  drawPile: generateDrawPile(numberOfPlayers),
   discardPile: []
 })
 
@@ -85,8 +85,21 @@ const defaultHand = () => {
   return hand
 }
 
-function Game({ numberOfPlayers, generateHand = defaultHand }) {
-  const [state, dispatch] = useReducer(reducer, initialState(numberOfPlayers, generateHand))
+const defaultDrawPile = (numberOfPlayers) => {
+  const drawPile = []
+  for (let i = 0; i < 30; i++) {
+    drawPile.push(BORING)
+  }
+  for (let i = 0; i < numberOfPlayers - 1; i++) {
+    drawPile.push(BUM)
+  }
+  drawPile.push(DEFENSE)
+  drawPile.sort(() => Math.random() * 60 - 30)
+  return drawPile
+}
+
+function Game({ numberOfPlayers, generateHand = defaultHand, generateDrawPile = defaultDrawPile }) {
+  const [state, dispatch] = useReducer(reducer, initialState(numberOfPlayers, generateHand, generateDrawPile))
   const { looser, drawPile, discardPile, playerCards } = state
 
   const drawACard = (playerNumber) => {

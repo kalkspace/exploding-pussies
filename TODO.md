@@ -1,6 +1,6 @@
-- random cards for players
+- [x] random cards for players
 
-  - every player gets one defense card
+  - [x] every player gets one defense card
 
 - random draw pile
 
