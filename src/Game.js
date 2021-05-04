@@ -1,39 +1,37 @@
 import { useEffect, useReducer, useState } from "react";
 
-const BUM = "Bumm!";
-const DEFENSE = "Defense";
-const BORING = "Boring";
+const numberOfCardsOnHand = 5 // without defense card
+
+export const BUM = "Bumm!";
+export const DEFENSE = "Defense";
+export const BORING = "Boring";
 
 const DRAWACARD = "drawACard";
 
-const initialState = {
+const initialState = (numberOfPlayers, generateHand) => ({
+  numberOfPlayers,
   looser: null,
-  playerCards: {
-    player1: [BORING, BORING],
-    player2: [DEFENSE, BORING],
-  },
+  playerCards: new Array(numberOfPlayers).fill().map((hand, playerNumber) => generateHand(playerNumber)),
   drawPile: [BORING, BUM, DEFENSE, BORING],
   discardPile: []
-}
+})
 
 const drawACardAction = {
   type: DRAWACARD,
   player: ''
 }
 
-const handleBum = (prevState, player) => {
+const handleBum = (prevState, playerNumber) => {
   const { playerCards, drawPile, discardPile } = prevState
-  const cards = playerCards[player];
+  const cards = playerCards[playerNumber];
   const defenseIndex = cards.indexOf(DEFENSE);
   if (defenseIndex !== -1) {
     const currentPlayerCards = [
       ...cards.slice(0, defenseIndex),
       ...cards.slice(defenseIndex + 1),
     ];
-    const newPlayerCards = {
-      ...playerCards,
-      [player]: currentPlayerCards,
-    };
+    const newPlayerCards = [...playerCards]
+    playerCards[playerNumber] = currentPlayerCards
     const newDiscardPile = [...discardPile, DEFENSE];
     const newBumIndex = Math.random() * drawPile.length;
     const newDrawPile = [
@@ -48,24 +46,24 @@ const handleBum = (prevState, player) => {
       discardPile: newDiscardPile
     };
   } else {
-    return { ...prevState, looser: player }
+    return { ...prevState, looser: playerNumber }
   }
 };
 
 const reducer = (prevState, action) => {
   switch (action.type) {
     case DRAWACARD: {
-      const { player } = action;
+      const { playerNumber } = action;
       const [card, ...newDrawPile] = prevState.drawPile;
       switch (card) {
         case BUM: {
-          return handleBum(prevState, player);
+          return handleBum(prevState, playerNumber);
         }
         default: {
-          const playerCards = {
+          const playerCards = [
             ...prevState.playerCards,
-            [player]: [...prevState.playerCards[player], card],
-          };
+          ];
+          playerCards[playerNumber] = [...prevState.playerCards[playerNumber], card]
           return {
             ...prevState,
             drawPile: newDrawPile,
@@ -74,30 +72,37 @@ const reducer = (prevState, action) => {
         }
       }
     }
+    default:
+      return prevState
   }
-
-  return prevState
-
 }
 
-function Game() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+const defaultHand = () => {
+  const hand = [DEFENSE]
+  for (let i = 0; i < numberOfCardsOnHand; i++) {
+    hand.push(BORING) // TODO: In future draw these fro draw pile before Bumm! and extra defense get in there
+  }
+  return hand
+}
+
+function Game({ numberOfPlayers, generateHand = defaultHand }) {
+  const [state, dispatch] = useReducer(reducer, initialState(numberOfPlayers, generateHand))
   const { looser, drawPile, discardPile, playerCards } = state
 
-  const drawACard = (player) => {
-    dispatch({ type: DRAWACARD, player })
+  const drawACard = (playerNumber) => {
+    dispatch({ type: DRAWACARD, playerNumber })
   };
   if (looser != null) {
-    return `${looser}, you loose!`
+    return `player${looser + 1}, you loose!`
   }
   return (
     <>
       <h1>Exploding pussies</h1>
-      {Object.keys(playerCards).map((player) => (
-        <p key={player}>
-          Cards of {player}:{" "}
-          <button onClick={() => drawACard(player)}>Draw a card, {player}!</button>
-          {playerCards[player].map((card, index) => (
+      {playerCards.map((hand, playerNumber) => (
+        <p key={playerNumber}>
+          Cards of player{playerNumber + 1}:{" "}
+          <button onClick={() => drawACard(playerNumber)}>Draw a card, player{playerNumber + 1}!</button>
+          {hand.map((card, index) => (
             <li key={index}>{card}</li>
           ))}
         </p>

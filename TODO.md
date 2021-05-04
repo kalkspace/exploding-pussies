@@ -1,19 +1,22 @@
-- random hands for players and random draw pile
+- random cards for players
 
-  rules:
-    - ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
-    - every player gets one defense card
-   
+  - every player gets one defense card
+
+- random draw pile
+
+  - ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
+
 - choose / set number of players (with names)
-
 - set state: current player, next player
 
 - define other cards instead of BORING
-  - shuffle
-  - show next three cards in draw pile
-  - skip draw
 
-- define more cards 
+  - shuffle
+  - skip draw
+  - show next three cards in draw pile
+
+- define more cards
+
   - skip your draw, next player hast to draw two times
   - nope (next player refuses prev players action)
   - draw a card from another player

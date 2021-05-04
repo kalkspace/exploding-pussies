@@ -3,7 +3,7 @@ import Game from './Game.js';
 
 function App() {
   return (
-    <Game/>
+    <Game numberOfPlayers={4} />
   );
 }
 
