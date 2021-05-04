@@ -80,7 +80,7 @@ const reducer = (prevState, action) => {
 const defaultHand = () => {
   const hand = [DEFENSE]
   for (let i = 0; i < numberOfCardsOnHand; i++) {
-    hand.push(BORING) // TODO: In future draw these fro draw pile before Bumm! and extra defense get in there
+    hand.push(BORING) // TODO: In future draw these from draw pile before Bumm! and extra defense get in there
   }
   return hand
 }

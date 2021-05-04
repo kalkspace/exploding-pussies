@@ -2,12 +2,14 @@
 
   - [x] every player gets one defense card
 
-- random draw pile
+- [x] random draw pile
 
-  - ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
+  - [x] ({player - 1} bum cards in draw pile, 1 extra defense card in draw pile)
 
-- choose / set number of players (with names)
+- [x] choose / set number of players backend
+
 - set state: current player, next player
+- refactor: have only one button to draw a card
 
 - define other cards instead of BORING
 
